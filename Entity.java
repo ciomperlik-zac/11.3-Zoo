@@ -1,45 +1,45 @@
 
 import java.awt.Graphics;
 
-// TODO: add the abstract keyword to the class declaration
-public class Entity {
+public abstract class Entity {
     // optional code to assign a sequencial entity ID
     private static int lastID = 0;
     protected int id;
 
-    // TODO: add the Entity instance variables
+    protected String name;
+    protected int x, y;
+    protected boolean isAlive;
 
     public Entity(String name, int x, int y) {
         // optional code to assign a sequencial entity ID
         this.id = lastID;
         lastID = lastID + 1;
 
-        // TODO: complete the Entity constructor
+        this.name = name;
+        this.x = x;
+        this.y = y;
     }
 
     // ABSTRACT METHODS
     // tick and draw are called by the Zoo class
 
-    // TODO: add abstract method tick(Zoo z)
-    // TODO: add abstract method draw(Graphics g)
+    public abstract void tick(Zoo z, int tickCount);
 
+    public abstract void draw(Graphics g);
 
     // NON-ABSTRACT METHODS
     // isAlive, getX, and getY are all called by the Zoo class
 
     public boolean isAlive() {
-        // TODO: implement the isAlive method
-        return true;
+        return isAlive;
     }
 
     public int getX() {
-        // TODO: implement the getX method
-        return 0;
+        return x;
     }
 
     public int getY() {
-        // implement the getY method
-        return 0;
+        return y;
     }
 
 }

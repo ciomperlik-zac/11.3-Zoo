@@ -109,6 +109,10 @@ public class Zoo extends JPanel {
         }
     }
 
+    public static boolean percentChance(double percent) {
+        return rand.nextDouble() < percent * 0.01; 
+    }
+
     public static void main(String[] args) {
         // main Zoo object
         Zoo zoo = new Zoo(ZOO_COLS, ZOO_ROWS);
