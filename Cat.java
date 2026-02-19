@@ -13,18 +13,22 @@ public class Cat extends Animal {
 
     // TODO: override the tick method
     @Override
-    public void tick(Zoo z, int tickCount) {
+    public void tick(Zoo zoo, int tickCount) {
         boolean past500 = tickCount > 500;
 
         if (isSick) {
             if (past500) {
-                isAlive = Zoo.rand.nextInt(10) != 0;
+                if (Zoo.percentChance(10)) lives -= 1;
             } else {
-                isAlive = Zoo.rand.nextInt(1000) != 0;
+                if (Zoo.percentChance(0.1)) lives -=1;
             }
-        } else {
-            if (past500) isAlive = Zoo.rand.nextInt(100) != 0;
+        } else if (past500) {
+            if (Zoo.percentChance(1)) lives -= 1;
         }
+
+        isAlive = lives > 0;
+
+        if (tickCount % 10 == 0) move(zoo);
     }
 
     @Override
@@ -42,7 +46,28 @@ public class Cat extends Animal {
 
     @Override
     public void move(Zoo zoo) {
-        // TODO Auto-generated method stub
-        
+        int dx = 0;
+        int dy = 0;
+
+        if (zoo.at(x + 1, y).stream().anyMatch(e -> e instanceof Edible)) {
+            dx += 1;
+        } else if (zoo.at(x - 1, y).stream().anyMatch(e -> e instanceof Edible)) {
+            dx -= 1;
+        } else if (zoo.at(x, y + 1).stream().anyMatch(e -> e instanceof Edible)) {
+            dy += 1;
+        } else if (zoo.at(x, y - 1).stream().anyMatch(e -> e instanceof Edible)) {
+            dy -= 1;
+        } else {
+            int change = Zoo.rand.nextBoolean() ? 1 : -1;
+
+            if (Zoo.rand.nextBoolean()) {
+                dx += change;
+            } else {
+                dy += change;
+            }
+        }
+
+        x = zoo.wrapWidth(x + dx);
+        y = zoo.wrapHeight(y + dy);
     }
 }

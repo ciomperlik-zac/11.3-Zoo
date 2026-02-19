@@ -62,7 +62,7 @@ public class Zoo extends JPanel {
 	}
 
     // iterates through each cell in the grid, calling tick(Zoo)
-    public void tick() {
+    public void tick(int tickCount) {
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
 
@@ -76,7 +76,7 @@ public class Zoo extends JPanel {
                     Entity e = grid.get(y).get(x).remove(i);
 
                     if(e.isAlive()) {
-                        e.tick(this);
+                        e.tick(this, tickCount);
                         grid.get(wrap(e.getY(), height)).get(wrap(e.getX(), width)).add(e);
                     }
                 }
@@ -88,7 +88,7 @@ public class Zoo extends JPanel {
     public ArrayList<Entity> at(int x, int y) {
         int atX = wrap(x, width);
         int atY = wrap(y, height);
-        // ArrayList constructor copies references from the passed LinkedList
+        // ArrayList `structor copies references from the passed LinkedList
         return new ArrayList<Entity>(grid.get(atY).get(atX));
     }
 
@@ -107,6 +107,14 @@ public class Zoo extends JPanel {
         else {
             return (thresh - val) % thresh;
         }
+    }
+
+    public int wrapWidth(int val) {
+        return wrap(val, width);
+    }
+
+    public int wrapHeight(int val) {
+        return wrap(val, height);
     }
 
     public static boolean percentChance(double percent) {
@@ -137,7 +145,7 @@ public class Zoo extends JPanel {
 
             // TODO: add food and animals every 50, 100, 150, etc. ticks using tickCount and modulo (%)
 
-            zoo.tick();
+            zoo.tick(tickCount);
 
             // redraw the frame
             zoo.revalidate();
