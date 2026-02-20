@@ -16,6 +16,7 @@ public class Cat extends Animal {
     public void tick(Zoo zoo, int tickCount) {
         boolean past500 = tickCount > 500;
 
+        // Handle Death
         if (isSick) {
             if (past500) {
                 if (Zoo.percentChance(10)) lives -= 1;
@@ -28,7 +29,15 @@ public class Cat extends Animal {
 
         isAlive = lives > 0;
 
+        // Handle movement
         if (tickCount % 10 == 0) move(zoo);
+
+        // Handle breeding
+        if (!zoo.findAdjacentMatches(x, y, e -> e instanceof Cat).isEmpty()) {
+            if (Zoo.percentChance(10)) {
+                
+            }
+        }
     }
 
     @Override
@@ -40,8 +49,12 @@ public class Cat extends Animal {
 
     @Override
     public void eat(Food food) {
-        // TODO Auto-generated method stub
-        
+        if (hunger > 25) {
+            if (Zoo.percentChance(99)) {
+                hunger -= food.nutritionalValue;
+                food.beEaten(this);
+            }
+        }
     }
 
     @Override
@@ -49,22 +62,26 @@ public class Cat extends Animal {
         int dx = 0;
         int dy = 0;
 
-        if (zoo.at(x + 1, y).stream().anyMatch(e -> e instanceof Edible)) {
-            dx += 1;
-        } else if (zoo.at(x - 1, y).stream().anyMatch(e -> e instanceof Edible)) {
-            dx -= 1;
-        } else if (zoo.at(x, y + 1).stream().anyMatch(e -> e instanceof Edible)) {
-            dy += 1;
-        } else if (zoo.at(x, y - 1).stream().anyMatch(e -> e instanceof Edible)) {
-            dy -= 1;
-        } else {
-            int change = Zoo.rand.nextBoolean() ? 1 : -1;
+        ArrayList<Entity> foods = zoo.findAdjacentMatches(x, y, e -> e instanceof Edible);
 
-            if (Zoo.rand.nextBoolean()) {
-                dx += change;
+        if (!foods.isEmpty()) {
+            Entity food = foods.get(0);
+
+            dx = food.x - x;
+            dy = food.y - y;
+        } else {
+            dx = (int) (Math.random() * 3) - 1;
+
+            if (dx == 0) {
+                dy = Zoo.rand.nextBoolean() ? -1 : 1;
             } else {
-                dy += change;
+                dy = (int) (Math.random() * 3) - 1;
             }
+        }
+
+        if (!zoo.atMatches(x + dx, y + dy, e -> e instanceof Animal && !(e instanceof Rat)).isEmpty()) {
+                dx *= -1;
+                dy *= -1;
         }
 
         x = zoo.wrapWidth(x + dx);

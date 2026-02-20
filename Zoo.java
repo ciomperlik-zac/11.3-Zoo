@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 // in general it would be better practice to separate the data and display functionalities of Zoo
 // into separate classes - they're combined here for simplicity and ease of understanding
@@ -92,11 +94,49 @@ public class Zoo extends JPanel {
         return new ArrayList<Entity>(grid.get(atY).get(atX));
     }
 
+    // Returns a list of entities at the point that match a predicate
+    public ArrayList<Entity> atMatches(int x, int y, Predicate<Object> match) {
+        return at(x, y).stream().filter(match).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    // Returns a list of all adjacent entities that match the predicate
+    public ArrayList<Entity> findAdjacentMatches(int x, int y, Predicate<Object> match) {
+        ArrayList<Entity> matches = new ArrayList<>();
+
+        matches.addAll(atMatches(x - 1, y, match));
+        matches.addAll(atMatches(x - 1, y - 1, match));
+        matches.addAll(atMatches(x, y + 1, match));
+        matches.addAll(atMatches(x + 1, y + 1, match));
+        matches.addAll(atMatches(x + 1, y, match));
+        matches.addAll(atMatches(x + 1, y - 1, match));
+        matches.addAll(atMatches(x, y - 1, match));
+        matches.addAll(atMatches(x - 1, y - 1, match));
+
+        return matches;
+    }
+
     // add an Entity to the grid
     public void add(Entity e) {
         int atX = wrap(e.getX(), width);
         int atY = wrap(e.getY(), height);
         grid.get(atY).get(atX).add(e);
+    }
+
+    // spawn at a random location
+    public void spawn(int x, int y, Entity entity) {
+        for (int range = 5; range < 20; range++) {
+            for (int dx = -range; dx <= range; dx++) {
+                for (int dy= -range; dy <= range; dy++) {
+                    if (at(x + dx, y + dy).isEmpty()) {
+                        entity.x = x + dx;
+                        entity.y = y + dy;
+                        add(entity);
+
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     // wrap a val between 0 and thresh
